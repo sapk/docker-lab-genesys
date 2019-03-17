@@ -1,0 +1,16 @@
+version: '3.5'
+
+services:
+  database:
+    hostname: database
+    build:
+      context: .
+      dockerfile: build/postgres/Dockerfile  
+      args:
+        LCA_VERSION: "8510029b1_ENU"
+    image: genesys-postgres
+    restart: always
+    env_file:
+      - ./config/database.env
+    volumes:
+      - "./data/postgresql:/var/lib/postgresql/data"
