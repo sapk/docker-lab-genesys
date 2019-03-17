@@ -41,8 +41,29 @@ services:
     image: genesys-cfg
     restart: always
     env_file:
+      - ./config/database.env
       - ./config/cfg.env
 #    ports:
 #      - 2020:2020
 #      - 2021:2021
+#Only export port on trusted network
+
+  gax:
+    hostname: gax
+    depends_on:
+      - cfg
+    build:
+      context: .
+      dockerfile: build/gax/Dockerfile      
+      args:
+        GAX_VERSION: "9000015b1_ENU"
+        LCA_VERSION: "8510029b1_ENU"
+    image: genesys-gax
+    restart: always
+    env_file:
+      - ./config/database.env
+      - ./config/cfg.env
+      - ./config/gax.env
+#    ports:
+#      - "8080:8080"
 #Only export port on trusted network
