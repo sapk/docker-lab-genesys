@@ -14,3 +14,16 @@ services:
       - ./config/database.env
     volumes:
       - "./data/postgresql:/var/lib/postgresql/data"
+
+  flexlm:
+    hostname: flexlm
+    #mac_address: 00:00:00:00:00:00
+    build:
+      context: .
+      dockerfile: build/flexlm/Dockerfile
+      args:
+        LCA_VERSION: "8510029b1_ENU"
+    image: genesys-flexlm
+    restart: always
+    volumes:
+      - "./config/license.dat:/run/secrets/license.dat:ro"
