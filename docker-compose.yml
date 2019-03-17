@@ -27,3 +27,22 @@ services:
     restart: always
     volumes:
       - "./config/license.dat:/run/secrets/license.dat:ro"
+
+  cfg:
+    hostname: cfg
+    depends_on:
+      - database
+    build:
+      context: .
+      dockerfile: build/cfg/Dockerfile
+      args:
+        LCA_VERSION: "8510029b1_ENU"
+        CFG_VERSION: "8510128b1_ENU"
+    image: genesys-cfg
+    restart: always
+    env_file:
+      - ./config/cfg.env
+#    ports:
+#      - 2020:2020
+#      - 2021:2021
+#Only export port on trusted network
