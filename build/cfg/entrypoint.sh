@@ -1,7 +1,6 @@
 #!/bin/sh
 
 . /gcti/script/network.sh
-. /gcti/script/postgres.sh
 . /gcti/script/lca.sh
 
 # Start LCA
@@ -13,6 +12,7 @@ Wait_For_Port "$DB_HOST" "$DB_PORT" "database ($DB_TYPE)"
 sleep 3
 
 if [ "$DB_TYPE" = "postgre" ]; then
+  . /gcti/script/postgres.sh
   Create_Postgres_Database "$DB_HOST" "$DB_PORT" "$DB_USER" "$DB_PASS" "$CFG_DB_NAME"
 
   echo "Start-up: Checking pgsql database $CFG_DB_NAME for table 'cfg_locale'"
@@ -26,6 +26,11 @@ if [ "$DB_TYPE" = "postgre" ]; then
     #echo "Start-up: Init Default password: '$DEFAULT_PASSWORD' '${ENC_PASS^^}'"
     psql -c "UPDATE cfg_person SET password='${ENC_PASS^^}' , salted_string=NULL WHERE dbid=100;"
   fi
+fi
+if [ "$DB_TYPE" = "mssql" ]; then
+  . /gcti/script/mssql.sh
+  Create_Mssql_Database "$DB_HOST" "$DB_PORT" "$DB_USER" "$DB_PASS" "$CFG_DB_NAME"
+
 fi
 #TODO use confserv -preparedb and set config file
 #TODO allow other name via -s params

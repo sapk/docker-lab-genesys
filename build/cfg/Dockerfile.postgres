@@ -17,7 +17,7 @@ RUN yum install -y glibc.i686 glibc && yum clean all && rm -rf /var/cache/yum
 
 ADD source/IP_ConfigServer_${CFG_VERSION}_linux.tar.gz /source/cfg
 
-COPY build/cfg/genesys_silent.ini  /source/cfg/ip/genesys_silent.ini
+COPY build/cfg/genesys_silent.postgres.ini  /source/cfg/ip/genesys_silent.ini
 
 WORKDIR /source/cfg/ip
 RUN ./install.sh -s -fr /source/cfg/ip/genesys_silent.ini -fl /source/cfg/ip/genesys_install_result.log \

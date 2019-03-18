@@ -1,0 +1,48 @@
+FROM centos as build-lca
+ARG  LCA_VERSION=8510029b1_ENU
+#Add 32 bit support to centos (Needed for install script)
+RUN yum install -y glibc.i686 glibc && yum clean all && rm -rf /var/cache/yum
+
+ADD source/IP_LCA_${LCA_VERSION}_linux.tar.gz /source/lca
+
+COPY build/lca/genesys_silent.ini  /source/lca/ip/genesys_silent.ini
+
+WORKDIR /source/lca/ip
+RUN ./install.sh -s -fr /source/lca/ip/genesys_silent.ini -fl /source/lca/ip/genesys_install_result.log; cat /source/lca/ip/genesys_install_result.log
+
+FROM centos as build-env
+ARG  CFG_VERSION=8510128b1_ENU
+#Add 32 bit support to centos
+RUN yum install -y glibc.i686 glibc && yum clean all && rm -rf /var/cache/yum
+
+ADD source/IP_ConfigServer_${CFG_VERSION}_linux.tar.gz /source/cfg
+
+COPY build/cfg/genesys_silent.mssql.ini  /source/cfg/ip/genesys_silent.ini
+
+WORKDIR /source/cfg/ip
+RUN ./install.sh -s -fr /source/cfg/ip/genesys_silent.ini -fl /source/cfg/ip/genesys_install_result.log \
+ ;  cat /source/cfg/ip/genesys_install_result.log
+
+FROM centos
+
+#Install mssql dep
+RUN curl https://packages.microsoft.com/config/rhel/7/prod.repo > /etc/yum.repos.d/msprod.repo \
+ && ACCEPT_EULA=Y yum install -y mssql-tools unixODBC-devel nmap-ncat && yum clean all && rm -rf /var/cache/yum
+
+ENV PATH="${PATH}:/opt/mssql-tools/bin"
+
+COPY --from=build-lca /gcti/lca /gcti/lca
+COPY --from=build-env /gcti/cfg /gcti/cfg
+COPY build/cfg/entrypoint.sh /entrypoint.sh
+
+COPY script /gcti/script
+
+WORKDIR /gcti/cfg
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["./confserv"]
+EXPOSE 2020/tcp
+EXPOSE 2021/tcp
+
+#TODO Find a better way than running LCA in every container
+#TODO add env variable to configure config server

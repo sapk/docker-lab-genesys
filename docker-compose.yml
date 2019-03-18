@@ -34,11 +34,11 @@ services:
       - database
     build:
       context: .
-      dockerfile: build/cfg/Dockerfile
+      dockerfile: build/cfg/Dockerfile.postgres
       args:
         LCA_VERSION: "8510029b1_ENU"
         CFG_VERSION: "8510128b1_ENU"
-    image: genesys-cfg
+    image: genesys-cfg:postgres
     restart: always
     env_file:
       - ./config/postgres.env

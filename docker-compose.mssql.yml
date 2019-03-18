@@ -1,5 +1,7 @@
 version: '3.5'
 
+## By using this docker-compose for mssql base you accept the mssql EULA
+
 services:
   database:
     hostname: database
@@ -34,14 +36,14 @@ services:
       - database
     build:
       context: .
-      dockerfile: build/cfg/Dockerfile
+      dockerfile: build/cfg/Dockerfile.mssql
       args:
         LCA_VERSION: "8510029b1_ENU"
         CFG_VERSION: "8510128b1_ENU"
-    image: genesys-cfg
+    image: genesys-cfg:mssql
     restart: always
     env_file:
-      - ./config/postgres.env
+      - ./config/mssql.env
       - ./config/cfg.env
 #    ports:
 #      - 2020:2020
