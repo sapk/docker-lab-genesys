@@ -11,7 +11,7 @@ services:
     image: genesys-postgres
     restart: always
     env_file:
-      - ./config/database.env
+      - ./config/postgres.env
     volumes:
       - "./data/postgresql:/var/lib/postgresql/data"
 
@@ -41,7 +41,7 @@ services:
     image: genesys-cfg
     restart: always
     env_file:
-      - ./config/database.env
+      - ./config/postgres.env
       - ./config/cfg.env
 #    ports:
 #      - 2020:2020
@@ -61,7 +61,7 @@ services:
     image: genesys-gax
     restart: always
     env_file:
-      - ./config/database.env
+      - ./config/postgres.env
       - ./config/cfg.env
       - ./config/gax.env
 #    ports:
