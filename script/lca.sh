@@ -4,7 +4,7 @@
 
 #TODO check deps like lca ^^
 
-function Genesys_Start_LCA {
+Genesys_Start_LCA () {
   local port=${1:-'4999'}
   
   echo "Start-up: Starting LCA to launch on port $port..."

@@ -1,0 +1,69 @@
+version: '3.5'
+
+services:
+  database:
+    hostname: database
+    build:
+      context: .
+      dockerfile: build/mssql/Dockerfile  
+      args:
+        LCA_VERSION: "8510029b1_ENU"
+    image: genesys-mssql
+    restart: always
+    env_file:
+      - ./config/mssql.env
+    volumes:
+      - "./data/mssql:/var/opt/mssql"
+
+  flexlm:
+    hostname: flexlm
+    #mac_address: 00:00:00:00:00:00
+    build:
+      context: .
+      dockerfile: build/flexlm/Dockerfile
+      args:
+        LCA_VERSION: "8510029b1_ENU"
+    image: genesys-flexlm
+    restart: always
+    volumes:
+      - "./config/license.dat:/run/secrets/license.dat:ro"
+
+  cfg:
+    hostname: cfg
+    depends_on:
+      - database
+    build:
+      context: .
+      dockerfile: build/cfg/Dockerfile
+      args:
+        LCA_VERSION: "8510029b1_ENU"
+        CFG_VERSION: "8510128b1_ENU"
+    image: genesys-cfg
+    restart: always
+    env_file:
+      - ./config/postgres.env
+      - ./config/cfg.env
+#    ports:
+#      - 2020:2020
+#      - 2021:2021
+#Only export port on trusted network
+
+  gax:
+    hostname: gax
+    depends_on:
+      - cfg
+    build:
+      context: .
+      dockerfile: build/gax/Dockerfile      
+      args:
+        GAX_VERSION: "9000015b1_ENU"
+        LCA_VERSION: "8510029b1_ENU"
+    image: genesys-gax
+    restart: always
+    env_file:
+      - ./config/postgres.env
+      - ./config/cfg.env
+      - ./config/gax.env
+#    ports:
+#      - "8080:8080"
+#Only export port on trusted network
